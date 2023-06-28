@@ -38,14 +38,9 @@ export const ListaVentas = () => {
                 >
                     <FlechaArriba />
                 </button>
-            </div>
-            <ul className={`
-                flex flex-col items-center text-lg w-[100%] px-4 py-1 gap-2 max-h-[50vh] h-auto overflow-y-scroll overflow-x-hidden transition-all duration-[50] ease-linear
-                ${vista ? "opacity-100 z-50" : "-z-10 opacity-0 hover:cursor-auto max-h-0"}
-            `}>
-                <li className={`
-                    ${vista ? "absolute flex opacity-100 z-50" : "-z-10 opacity-0 hover:cursor-auto hidden"} 
-                        py-1 px-5 w-full md:w-[50%] flex bg-slate-300 
+                <span className={`
+                    ${vista ? "flex opacity-100 z-50" : "-z-10 opacity-0 hover:cursor-auto hidden"} 
+                        py-1 px-5 ms-5 w-full flex bg-slate-300 
                         justify-between items-center 
                         text-sm md:text-base
                         transition-all duration-100 ease-linear
@@ -61,10 +56,15 @@ export const ListaVentas = () => {
                     <p className=' mx-[2.5%] text-center'>
                         Precio total
                     </p>
-                </li>
+                </span>
+            </div>
+            <ul className={`
+                flex flex-col items-center text-lg w-[100%] px-4 py-1 gap-2 max-h-[50vh] overflow-y-scroll overflow-x-hidden transition-all duration-[100] ease-linear
+                ${vista ? "opacity-100 z-50" : "-z-10 opacity-0 hover:cursor-auto max-h-0 h-0"}
+            `}>
                 {ventas.map((n, i) =>
                     <li className={`
-                    ${i === 0 ? "mt-14" : ""}
+                    ${i === 0 ? "mt-4" : ""}
                     ${vista ? "flex opacity-100 z-10 hover:opacity-75 hover:cursor-pointer" : "-z-10 opacity-0 hover:cursor-auto"} 
                         py-2 px-5 w-full flex bg-white justify-between items-center text-sm md:text-base
                     `}
@@ -119,33 +119,33 @@ export const ListaProductos = () => {
                 >
                     <FlechaArriba />
                 </button>
-            </div>
-            <ul className={`
-                flex flex-col items-center text-lg w-[100%] px-4 py-1 gap-2 max-h-[50vh] h-auto overflow-y-scroll overflow-x-hidden transition-all duration-[50] ease-linear
-                ${vista ? "opacity-100 z-50" : "-z-10 opacity-0 hover:cursor-auto max-h-0"}
-            `}>
                 <li className={`
-                    ${vista ? "absolute flex opacity-100 z-50" : "-z-10 opacity-0 hover:cursor-auto hidden"} 
-                        py-1 px-2 w-full md:w-[500px] flex bg-slate-300 
+                    ${vista ? "flex opacity-100 z-50" : "-z-10 opacity-0 hover:cursor-auto hidden"} 
+                        py-1 px-2 ms-5 w-full flex bg-slate-300 
                         justify-between items-center 
                         text-sm md:text-base
                         transition-all duration-100 ease-linear
                     `}
                     onClick={e => { e.preventDefault(); }}
                 >
-                    <p className='w-[100px] mx-[2.5%] text-center'>
+                    <p className='w-[33%] mx-[2.5%] text-start'>
                         Nombre
                     </p>
-                    <p className='w-[100px] mx-[2.5%] text-center'>
+                    <p className='w-[33%] mx-[2.5%] text-center'>
                         Cantidad Vendida
                     </p>
-                    <p className='w-[100px] mx-[2.5%] text-center'>
+                    <p className='w-[33%] mx-[2.5%] text-center md:text-end'>
                         Valor Acomulado
                     </p>
                 </li>
+            </div>
+            <ul className={`
+                flex flex-col items-center text-lg w-[100%] px-4 py-1 gap-2 max-h-[50vh] overflow-y-scroll overflow-x-hidden transition-all duration-[100] ease-linear
+                ${vista ? "opacity-100 z-50" : "-z-10 opacity-0 hover:cursor-auto max-h-0 h-0"}
+            `}>
                 {ventas.map((n, i) =>
                     <li className={`
-                    ${i === 0 ? "mt-20" : ""}
+                    ${i === 0 ? "mt-4" : ""}
                     ${vista ? "flex opacity-100 z-10 hover:opacity-75 hover:cursor-pointer" : "-z-10 opacity-0 hover:cursor-auto"} 
                         py-2 px-5 w-full flex bg-white justify-between items-center text-sm md:text-base
                     `}

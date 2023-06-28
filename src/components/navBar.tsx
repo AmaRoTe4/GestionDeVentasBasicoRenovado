@@ -3,30 +3,35 @@ import { Link, useLocation, useNavigate } from 'react-router-dom'
 import Menu from "../svg/menu.svg"
 import FondoOscuro from './fondoOscuro'
 
-export default function NavBar() {
+interface props {
+    btnEstado:boolean
+    setBtnEstado:React.Dispatch<React.SetStateAction<boolean>>
+}
+
+export default function NavBar({btnEstado , setBtnEstado}:props) {
     const location = useLocation().pathname
     const id: number = parseInt(useLocation().pathname.split('/')[3])
-    const [btnEstado, setBtnEstado] = useState<boolean>(false)
 
     return (
         <>
             <FondoOscuro vista={btnEstado} />
             <nav
-                className="bg-verde w-full min-h-[60px] h-[10vh] flex items-center"
+                id="NavBar"
+                className="bg-verde w-full min-h-[60px] h-[10vh] flex items-center justify-center md:justify-start"
             >
-                <button className='md:hidden ms-5' onClick={e => { e.preventDefault(); setBtnEstado(!btnEstado) }}>
+                <button className='md:hidden ms-5 w-full' onClick={e => { e.preventDefault(); setBtnEstado(!btnEstado) }}>
                     {/* @ts-ignore */}
                     <Menu className="h-[30px] hover:opacity-50" />
                 </button>
-                <ul className={`w-[95%] h-[95%] flex items-center justify-center md:justify-start z-[100] 
+                <ul 
+                    id="NavBarUl"
+                    className={`absolute md:relative top-0 transition-all max-h-[220px] md:max-h-auto duration-100 w-[80%] h-[95%] flex items-center justify-center md:justify-start z-[100] 
                     ${!btnEstado
-                        ? "opacity-[0] md:opacity-[100]"
+                        ? "translate-y-0 opacity-[0] md:opacity-[100]"
                         : `
                         bg-inherit rounded-md border border-black
                         flex-col 
-                        translate-y-44 transition-all duration-200 
-                        absolute top-0 left-[10%] z-100
-                        max-h-[220px] w-[80%] 
+                        translate-y-44 
                     `}`}>
                     <li className="w-[100px] h-[40px] flex justify-center items-center">
                         <Link to="/"

@@ -44,6 +44,11 @@ export default function Ventas() {
     const [cantidad, setCantidad] = useState<number>(0)
     const [vistaListaProducto, setVistaListaProducto] = useState<boolean>(false)
     const [vistaCarrito, setVistaCarrito] = useState<boolean>(false)
+    const busquedaRef = useRef<HTMLInputElement>(null);
+
+    const handleButtonClick = () => {
+        busquedaRef.current?.focus();
+    };
 
     const Busqueda = (text: string) => {
         setTextBusqueda(text)
@@ -58,6 +63,7 @@ export default function Ventas() {
             <form className='w-full h-auto flex flex-col items-center gap-5 mt-5'>
                 <div className='w-full h-auto flex justify-center items-center'>
                     <input
+                        ref={busquedaRef}
                         type="text"
                         placeholder='Busqueda'
                         className='text-lg w-[90%] md:w-[50%] p-2 rounded-t-sm border-b border-black'
@@ -86,7 +92,15 @@ export default function Ventas() {
                     />
                 </div>
                 <div className='w-full h-[50px] flex justify-center items-center'>
-                    <button type="button" className='bg-azul w-[90%] md:w-[50%] py-3 rounded-md text-white text-lg'>
+                    <button 
+                        type="button" 
+                        className='bg-azul w-[90%] md:w-[50%] py-3 rounded-md text-white text-lg'
+                        onKeyDown={e => {e.preventDefault(); 
+                            e.key === 'Enter'
+                            ? handleButtonClick()
+                            : "";
+                        }}
+                    >
                         Agregar
                     </button>
                 </div>
@@ -114,7 +128,7 @@ interface PropsLista {
     productos: string[]
 }
 
-export const ListaProductos = ({ setVista, vista, productos, productoSelect, setProductoSelect }: PropsLista) => {
+export const ListaProductos = ({ setVista, vista, productos, productoSelect, setProductoSelect }: PropsLista) => {    
     const Seleccionar = (n: string) => {
         setVista(false);
         if (setProductoSelect) setProductoSelect(n);
@@ -124,6 +138,7 @@ export const ListaProductos = ({ setVista, vista, productos, productoSelect, set
         <ul className={`${vista ? "shadow-lg shadow-black" : ""} z-10 absolute mt-14 flex flex-col items-center text-lg w-[90%] md:w-[50%] p-4 mb-12 rounded-b-md  gap-2 max-h-[60vh] min-h-[50px] overflow-y-scroll overflow-x-hidden transition-all duration-100 ease-linear bg-gris_claro`}>
             <li className='absolute w-full px-4 h-[40px] gap-5 flex justify-start items-center rounded-sm'>
                 <button
+                    tabIndex={-1}
                     type="button"
                     className={`hover:cursor-pointer transition-all duration-100 ease-linear ${vista && "rotate-180"}`}
                     onClick={e => { e.preventDefault(); setVista(n => !n) }}
@@ -142,7 +157,14 @@ export const ListaProductos = ({ setVista, vista, productos, productoSelect, set
                     transition-all duration-100 ease-in-out
                     text-sm md:text-base
                 `}
-                    onClick={e => { e.preventDefault(); Seleccionar(n !== undefined ? n : "Nada") }}
+                    tabIndex={0}
+                    onClick={e => { e.preventDefault(); Seleccionar(n !== undefined ? n : "") }}
+                    onKeyDown={e => {
+                        e.preventDefault();
+                        e.key === 'Enter'
+                            ? Seleccionar(n !== undefined ? n : "")
+                            : () => {};
+                    }}
                 >
                     <p className='w-full text-justify me-5 truncate'>
                         asdasdasdasdas asdbuasvbduasd ausdb
@@ -167,7 +189,7 @@ export const ListaCarrito = ({ productos }: PropsLista) => {
                         onClick={e => { e.preventDefault(); }}
                     >
                         <p className='w-[80%] text-justify me-5 truncate'>
-                            asdasdasdasdas 
+                            asdasdasdasdas
                         </p>
                         <p className='w-[100px]'>
                             {n}
