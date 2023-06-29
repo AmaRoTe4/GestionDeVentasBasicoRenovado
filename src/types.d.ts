@@ -1,19 +1,15 @@
-export interface Productos{
-    id?:number;
+export interface Producto{
+    id?:string;
+    _id?:string;
     precio:number;
     nombre:string;
     vendidos:number;
 }
 
-export interface ProductoVendido{
-    id?:number,
-    cantidad:number;
-}
-
-export interface Ventas{
-    id?:number
-    precio:number
-    cantidad:number
-    //ProductoVendido[] "json"...
-    venta:string
+export interface Venta {
+    id?:string;
+    fecha:string;
+    productos?:string;
+    cantidadPV:number;
+    precioT:number;
 }
