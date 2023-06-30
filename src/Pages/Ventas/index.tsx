@@ -7,52 +7,149 @@ import { useEffect, useRef, useState } from 'react'
 import { Bounce, toast } from 'react-toastify'
 import FlechaArriba from "../../svg/flechaArriba.svg"
 import Remove from "../../svg/delete.svg"
+import { Producto, Venta } from '../../types'
+import { GetAllProducto } from '../../functions/productos'
 
 export default function Ventas() {
-    const [total, setTotal] = useState<number[]>([0, 0])
-    //const [prtsPorVender , setPrtsPorVender] = useState<InterProductos[]>([])
-    //const [elementos , setElementos] = useState<InterProductos[]>([])
-    //const [eleSelc , setEleSelc] = useState<InterProductos>({
-    //    id:0,
-    //    nombre:'',
-    //    precio:0,
-    //    vendidos:0
-    //})
+    const [cantidadPV, setCantidadPV] = useState<number>(0)
+    const [precioT, setPrecioT] = useState<number>(0)
 
-    //useEffect(() => {
-    //    cargaDeElementos()
-    //},[])
+    const [prtsPorVender, setPrtsPorVender] = useState<Producto[]>([])
+    const [prod, setProd] = useState<Producto[]>([])
+    const [prodUsar, setProdUsar] = useState<Producto[]>([])
+    const [prodSelect, setProdSelect] = useState<Producto>({
+        precio: 0,
+        nombre: "",
+        vendidos: 0
+    })
 
-    //const cargaDeElementos = async () => {
-    //    const aux = await mostrarTodosLosProductos()
-    //    setElementos([eleSelc , ...aux])
-    //}
-
-    //const ObtenerEleSelc = async (nombre:string) => {
-    //    if(nombre === undefined) return
-    //    const aux = await mostrarProductoNombre(nombre)
-    //    setEleSelc(aux)
-    //}
-
-    //const limpiar = () => {
-    //    setTotal([0,0])
-    //    setPrtsPorVender([])
-    //}
-    const [prod, setProd] = useState<string[]>(["1", "2", "3", "4", "50000", "1", "2", "3", "4", "50000"])
-    const [prodSelect, setProdSelect] = useState<string>("")
     const [textBusqueda, setTextBusqueda] = useState<string>("")
     const [cantidad, setCantidad] = useState<number>(0)
+
     const [vistaListaProducto, setVistaListaProducto] = useState<boolean>(false)
     const [vistaCarrito, setVistaCarrito] = useState<boolean>(false)
     const busquedaRef = useRef<HTMLInputElement>(null);
 
-    const handleButtonClick = () => {
-        busquedaRef.current?.focus();
-    };
+    useEffect(() => {
+        calculador()
+    }, [prtsPorVender])
+
+    const calculador = () => {
+        let valor: number = 0;
+        let cantidadV: number = 0;
+
+        prtsPorVender.map(n => {
+            valor += (n.precio * n.vendidos)
+            cantidadV += n.vendidos
+        })
+
+        setCantidadPV(cantidadV)
+        setPrecioT(valor)
+    }
+
+    useEffect(() => {
+        obtenerProductos()
+    }, [])
+
+    const obtenerProductos = async () => {
+        //const aux = await GetAllProducto()
+        const aux: Producto[] = [
+            {
+                id: "1",
+                precio: 200,
+                nombre: "Coca 1L",
+                vendidos: 10
+            },
+            {
+                id: "2",
+                precio: 110,
+                nombre: "Pepsi 1L",
+                vendidos: 5
+            },
+            {
+                id: "3",
+                precio: 150,
+                nombre: "SevenUp 1L",
+                vendidos: 1
+            },
+            {
+                id: "4",
+                precio: 100,
+                nombre: "Spreet 1L",
+                vendidos: 1
+            }
+        ]
+        if (!aux) return
+        //@ts-ignore
+        const addProductos: Producto[] = aux.map(n => {
+            n?.id,
+                n.vendidos = 0,
+                n?.precio,
+                n?.nombre
+        }
+        );
+
+        setProdUsar(addProductos);
+        setProd(aux);
+    }
 
     const Busqueda = (text: string) => {
         setTextBusqueda(text)
         setVistaListaProducto(text !== "" ? true : false)
+
+        setProdUsar(prod.filter(m => m.nombre.toLowerCase().includes(text.toLowerCase())));
+    }
+
+    const validarACarrito = () => {
+        return prodSelect.vendidos !== undefined && prodSelect.nombre !== "" && cantidad > 0
+    }
+
+    const AgregarACarrito = () => {
+        if (!validarACarrito()) return;
+        let esta = false;
+
+        setPrtsPorVender(prtsPorVender.map(n => {
+            if (n.nombre === prodSelect.nombre) {
+                n.vendidos += cantidad;
+                esta = true;
+            }
+            return n;
+        }))
+
+        if (!esta) {
+            prodSelect.vendidos = cantidad;
+            setPrtsPorVender(n => [...n, prodSelect]);
+        }
+
+        cleanAgregar();
+        busquedaRef.current?.focus();
+    }
+
+    const realizarVenta = () => {
+        let newVenta: Venta = {
+            fecha: "",
+            cantidadPV,
+            precioT
+        }
+
+        cleanGlobal();
+    }
+
+    const cleanAgregar = () => {
+        setProdSelect({
+            precio: 0,
+            nombre: "",
+            vendidos: 0
+        })
+        setCantidad(0)
+        setTextBusqueda("")
+    }
+
+    const cleanGlobal = () => {
+        cleanAgregar();
+        setPrtsPorVender([])
+        setCantidadPV(0)
+        setPrecioT(0)
     }
 
     return (
@@ -65,18 +162,19 @@ export default function Ventas() {
                     <input
                         ref={busquedaRef}
                         type="text"
+                        value={textBusqueda}
                         placeholder='Busqueda'
                         className='text-lg w-[90%] md:w-[50%] p-2 rounded-t-sm border-b border-black'
                         onChange={e => Busqueda(e.target.value)}
                     />
                 </div>
-                <ListaProductos
+                {prodUsar && <ListaProductos
                     setVista={setVistaListaProducto}
                     vista={vistaListaProducto}
-                    productos={prod}
+                    productos={prodUsar}
                     productoSelect={prodSelect}
                     setProductoSelect={setProdSelect}
-                />
+                />}
                 <div className='w-full h-[100px] flex justify-center items-center mt-8'>
                     <input
                         className="text-lg w-[90%] md:w-[50%] text-end p-2 rounded-t-sm border-b border-black"
@@ -92,14 +190,15 @@ export default function Ventas() {
                     />
                 </div>
                 <div className='w-full h-[50px] flex justify-center items-center'>
-                    <button 
-                        type="button" 
+                    <button
+                        type="button"
                         className='bg-azul w-[90%] md:w-[50%] py-3 rounded-md text-white text-lg'
-                        onKeyDown={e => {e.preventDefault(); 
+                        onKeyDown={e => {
                             e.key === 'Enter'
-                            ? handleButtonClick()
-                            : "";
+                                ? AgregarACarrito()
+                                : "";
                         }}
+                        onClick={e => { e.preventDefault(); AgregarACarrito() }}
                     >
                         Agregar
                     </button>
@@ -107,14 +206,24 @@ export default function Ventas() {
             </form>
             <div className='w-full bg-red h-auto flex justify-center items-center mt-10'>
                 <ListaCarrito
+                    precioT={precioT}
                     setVista={setVistaCarrito}
                     vista={vistaCarrito}
-                    productos={prod}
+                    productos={prtsPorVender}
+                    setProductos={setPrtsPorVender}
                 />
             </div>
             <div className='w-full bg-red h-auto flex flex-col justify-center items-center mt-4 mb-16 gap-10 md:gap-4'>
-                <button className="bg-green-600 w-[90%] md:w-[50%] py-3 rounded-md text-white text-lg" type="button">Finalizar Venta</button>
-                <button className="bg-rojo w-[90%] md:w-[50%] py-3 rounded-md text-white text-lg" type="button">Limpiar</button>
+                <button 
+                    className="bg-green-600 w-[90%] md:w-[50%] py-3 rounded-md text-white text-lg" 
+                    type="button"
+                    onClick={e => {e.preventDefault(); realizarVenta()}}
+                >Finalizar Venta</button>
+                <button
+                    className="bg-rojo w-[90%] md:w-[50%] py-3 rounded-md text-white text-lg"
+                    type="button"
+                    onClick={e => { e.preventDefault(); cleanGlobal() }}
+                >Limpiar</button>
             </div>
         </main>
     )
@@ -123,13 +232,15 @@ export default function Ventas() {
 interface PropsLista {
     setVista: React.Dispatch<React.SetStateAction<boolean>>
     vista: boolean
-    setProductoSelect?: React.Dispatch<React.SetStateAction<string>>
-    productoSelect?: string
-    productos: string[]
+    setProductoSelect?: React.Dispatch<React.SetStateAction<Producto>>
+    productoSelect?: Producto
+    productos: Producto[]
+    setProductos?: React.Dispatch<React.SetStateAction<Producto[]>>
+    precioT?: number
 }
 
-export const ListaProductos = ({ setVista, vista, productos, productoSelect, setProductoSelect }: PropsLista) => {    
-    const Seleccionar = (n: string) => {
+export const ListaProductos = ({ setVista, vista, productos, productoSelect, setProductoSelect }: PropsLista) => {
+    const Seleccionar = (n: Producto) => {
         setVista(false);
         if (setProductoSelect) setProductoSelect(n);
     }
@@ -145,7 +256,7 @@ export const ListaProductos = ({ setVista, vista, productos, productoSelect, set
                 >
                     <FlechaArriba />
                 </button>
-                {productoSelect && <p>{productoSelect}</p>}
+                {productoSelect && <p>{productoSelect.nombre}</p>}
             </li>
             {vista && productos.map((n, i) =>
                 <li className={`
@@ -157,20 +268,21 @@ export const ListaProductos = ({ setVista, vista, productos, productoSelect, set
                     transition-all duration-100 ease-in-out
                     text-sm md:text-base
                 `}
-                    tabIndex={0}
-                    onClick={e => { e.preventDefault(); Seleccionar(n !== undefined ? n : "") }}
+                    key={n.id}
+                    tabIndex={1}
+                    onClick={e => { e.preventDefault(); Seleccionar(n) }}
                     onKeyDown={e => {
                         e.preventDefault();
                         e.key === 'Enter'
-                            ? Seleccionar(n !== undefined ? n : "")
-                            : () => {};
+                            ? Seleccionar(n)
+                            : () => { };
                     }}
                 >
                     <p className='w-full text-justify me-5 truncate'>
-                        asdasdasdasdas asdbuasvbduasd ausdb
+                        {n.nombre}
                     </p>
                     <p className='w-[100px]'>
-                        ${n}
+                        ${n.precio}
                     </p>
                 </li>
             )}
@@ -178,7 +290,13 @@ export const ListaProductos = ({ setVista, vista, productos, productoSelect, set
     )
 }
 
-export const ListaCarrito = ({ productos }: PropsLista) => {
+export const ListaCarrito = ({ productos , setProductos , precioT }: PropsLista) => {
+    const sacarDelCarro = (id:string) => {
+        if(id === "") return;
+        //@ts-ignore
+        setProductos(n => n.filter(m => m.id !== id))
+    }
+
     return (
         <div className='flex flex-col items-center w-full h-auto mb-12'>
             <ul className='flex flex-col items-center text-lg w-[100%] border-t border-black p-4 gap-2 max-h-[50vh] overflow-y-scroll overflow-x-hidden'>
@@ -186,18 +304,22 @@ export const ListaCarrito = ({ productos }: PropsLista) => {
                     <li className={`
                         py-2 px-5 w-full flex bg-white justify-between items-center text-sm md:text-base
                     `}
+                        key={n.id}
                         onClick={e => { e.preventDefault(); }}
                     >
                         <p className='w-[80%] text-justify me-5 truncate'>
-                            asdasdasdasdas
+                            {n.nombre}
                         </p>
                         <p className='w-[100px]'>
-                            {n}
+                            {n.vendidos}
                         </p>
                         <p className='w-[100px]'>
-                            ${n}
+                            ${n.precio * n.vendidos}
                         </p>
-                        <button className='h-full w-[30px] ms-5 hover:opacity-75 hover:cursor-pointer'>
+                        <button 
+                            className='h-full w-[30px] ms-5 hover:opacity-75 hover:cursor-pointer'
+                            onClick={e => {e.preventDefault() ; sacarDelCarro(n.id ? n.id : "")}}
+                        >
                             {/* @ts-ignore */}
                             <Remove className="h-full w-full" />
                         </button>
@@ -216,7 +338,7 @@ export const ListaCarrito = ({ productos }: PropsLista) => {
                     Total
                 </p>
                 <p className='w-[100px]'>
-                    $100000
+                    ${precioT}
                 </p>
             </div>
         </div>

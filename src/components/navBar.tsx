@@ -27,7 +27,7 @@ export default function NavBar({btnEstado , setBtnEstado}:props) {
                     id="NavBarUl"
                     className={`absolute md:relative top-0 transition-all max-h-[220px] md:max-h-auto duration-100 w-[80%] h-[95%] flex items-center justify-center md:justify-start z-[100] 
                     ${!btnEstado
-                        ? "translate-y-0 opacity-[0] md:opacity-[100]"
+                        ? "translate-x-[100vw] md:translate-x-0 translate-y-0 opacity-[0] md:opacity-[100]"
                         : `
                         bg-inherit rounded-md border border-black
                         flex-col 

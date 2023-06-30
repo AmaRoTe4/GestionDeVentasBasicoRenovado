@@ -1,42 +1,67 @@
 import { useEffect , useState } from "react";
 import { useLocation  , useNavigate} from "react-router-dom";
-import Productos from "../../types"
+import Productos, { Producto } from "../../types"
 import { Link } from "react-router-dom";
+import { CreateProducto, GetProducto, UpdateProducto } from "../../functions/productos";
 //import {comprobarNombre, mostrarProductoId, crearProducto , editarProducto } from "../../database/productos"
 
 export default function AccionesProducto(){
     const navigate = useNavigate();
-    const id_producto:number = parseInt(useLocation().pathname.split('/')[3])
+    const id_producto:string = useLocation().pathname.split('/')[3].toString();
     const [nombre , setNombre] = useState<string>('')
     const [precio , setPrecio] = useState<number>(0)
-    const [estadoDelInput, setEstadoDelInput] = useState<boolean>(id_producto === 0 ? false : true)
+    const [productoEdit , setProductoEdit] = useState<Producto>({
+        id: "0",
+        precio: 0,
+        nombre: "",
+        vendidos: 0,
+    })
 
     useEffect(() => {
         comprobarId();
-        //if(nombre === "") obtenerData(id_producto)
+        if(id_producto !== "") obtenerData(id_producto)
     },[])
 
     const comprobarId = () => {
-        if(!isNaN(id_producto) && !Number(id_producto)) {
+        if(typeof id_producto !== 'string') {
             navigate("/")
         }
     }
 
-
-    const comprobarEstadoBtn = async(nombreTarget:string) => {
-        //const aux = await comprobarNombre(nombreTarget , id)
-        //setEstadoDelInput(aux)
+    const comprobarPeticion = () => {
+        return precio > 0 && nombre.length > 0 && nombre.length < 40
     }
 
-    //const obtenerData = async (id:number) => {
-    //    //const aux:InterProductos[] = await mostrarProductoId(id);
-    //    //setNombre(aux[0].nombre)
-    //    //setPrecio(aux[0].precio)
-    //    //setVendidos(aux[0].vendidos)
-    //}
+    const obtenerData = async (id:string) => {
+        const producto = await GetProducto(id);
+        if(producto) setProductoEdit(producto);
+    }
+
+    const agregar = async () => {
+        if(!comprobarPeticion()) return;
+        const newProducto:Producto = {
+            precio,
+            nombre,
+            vendidos: 0
+        }
+        
+        await CreateProducto(newProducto);
+        clean();
+    }
+
+    const editar = async () => {
+        if(!comprobarPeticion()) return;
+        const newProducto:Producto = {
+            id: productoEdit.id,
+            precio,
+            nombre,
+            vendidos: productoEdit.vendidos
+        }
+        
+        await UpdateProducto(newProducto);
+    }
     
-    const crear = () => {
-        //crearProducto(nombre , precio)
+    const clean = () => {
         setNombre("")
         setPrecio(0)
     }
@@ -44,7 +69,7 @@ export default function AccionesProducto(){
     return (
         <main className="bg-gris_claro min-h-[500px] h-[90vh] w-full flex flex-col items-center">
             <div className="h-[10%] md:h-[15%] w-full flex justify-center items-center">
-                <h1 className="text-2xl">{isNaN(id_producto) ? 'Agregar' : "Editar"} Producto</h1>
+                <h1 className="text-2xl">{id_producto === "" ? 'Agregar' : "Editar"} Producto</h1>
             </div>
             <div className="h-[80%] md:h-[85%] mt-[10%] md:mt-0 w-full flex flex-col items-center">
                 <form className="w-[90%] h-[80%] mx-[5%] flex flex-col items-center justify-between">
@@ -75,8 +100,11 @@ export default function AccionesProducto(){
                             />
                         </div>
                     </div>
-                    <button className="w-[200px] p-2 bg-green-500 text-white rounded-md">
-                        {isNaN(id_producto) ? 'Agregar' : "Editar"}
+                    <button 
+                        className="w-[200px] p-2 bg-green-500 text-white rounded-md"
+                        onClick={e => {e.preventDefault(); id_producto === "" ? agregar() : editar()}}
+                    >
+                        {id_producto === "" ? 'Agregar' : "Editar"}
                     </button>
                 </form>
                 <div className="w-[90%] h-[20%] mx-[5%] flex justify-center items-center">

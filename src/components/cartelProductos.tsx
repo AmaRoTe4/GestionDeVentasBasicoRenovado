@@ -2,6 +2,7 @@ import FondoOscuro from "./fondoOscuro"
 import Close from "../svg/close.svg"
 import { useNavigate } from "react-router-dom";
 import { useEffect, useRef } from "react";
+import { DeleteProducto } from "../functions/productos";
 
 interface props {
     cartel:string
@@ -34,6 +35,14 @@ export default function CartelProducto({cartel , setCartel}:props) {
             e.preventDefault();
             refCerrar.current?.focus();
         }
+    }
+
+    const borrarProducto = async () => {
+        if(cartel === "") return;
+        await DeleteProducto(cartel)
+        setTimeout(() => {
+            navigate("/Productos")
+        }, 100)
     }
     
     return (
@@ -71,7 +80,7 @@ export default function CartelProducto({cartel , setCartel}:props) {
                         tabIndex={1}
                         ref={refEliminar}
                         className="min-w-[125px] h-[50px] bg-rojo rounded-md border border-black text-lg text-black hover:opacity-70 focus:opacity-70"
-                        onClick={e => {e.preventDefault(); console.log("eliminar")}}
+                        onClick={e => {e.preventDefault(); borrarProducto()}}
                         onKeyDown={e => {tabFocus(e)}}
                         id="btnEliminar"
                     >

@@ -2,26 +2,24 @@ import {useState,useEffect, useRef} from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import Mas from '../../svg/mas.svg'
 import CartelProducto from '../../components/cartelProductos'
-//import { InterProductos } from '../../types.'
-//import {mostrarTodosLosProductos } from '../../database/productos'
-//import { funcionesDeProcutos } from '../../functions/productos'
+import { Producto } from '../../types'
+import { GetAllProducto } from '../../functions/productos'
 
 export default function Productos(){
-    //const [element, setElement] = useState<InterProductos[]>([])
-    const [element, setElement] = useState<string[]>(["panque","2","3","4","5", "1","2","3","4","5" , "1","2","3","4","5","panque","2","3","4","5", "1","2","3","4","5" , "1","2","3","4","5"])
+    const [element, setElement] = useState<Producto[]>([])
     const [cartel , setCartel] = useState<string>("")
     const navigate = useNavigate()
     const referenciaDeInicio = useRef<HTMLLIElement>(null)
     const referenciaDeCartel = useRef<HTMLButtonElement>(null)
 
-    //useEffect(() => {
-    //    cargaDeElementos()
-    //},[element])
+    useEffect(() => {
+        cargaDeElementos()
+    },[cartel])
 
-    //const cargaDeElementos = async() => {
-    //    const aux = await mostrarTodosLosProductos()
-    //    setElement(aux)
-    //}
+    const cargaDeElementos = async() => {
+        const aux = await GetAllProducto()
+        if(aux) setElement(aux)
+    }
     
     const reiniciarTab = (e:any) => {
         e.key === "Tab" && referenciaDeInicio.current?.focus()
@@ -30,6 +28,7 @@ export default function Productos(){
     const mostrarVista = (id:string , e:any) => {
         e.preventDefault()
         e.target.blur();
+        if(id === "") return;
         setCartel(id)
         referenciaDeCartel.current?.focus()
     }
@@ -51,18 +50,18 @@ export default function Productos(){
                         <li
                             ref={i === 0 ? referenciaDeInicio : null}
                             tabIndex={1}
-                            key={n} 
-                            className="h-[100px] w-[200px] bg-gris_oscuro mb-3 mx-3 rounded-[10px] p-2 flex flex-col justify-center cursor-pointer hover:opacity-70 focus:opacity-70" 
+                            key={n.id} 
+                            className="h-[100px] w-[200px] bg-gris_oscuro mb-2 mx-2 rounded-[10px] p-2 flex flex-col justify-center cursor-pointer hover:opacity-70 focus:opacity-70" 
                             onDoubleClick={e => {
-                                mostrarVista(n , e)
+                                mostrarVista(n.id ? n.id : "" , e)
                             }}
                             onKeyDown={e => {
                                 e.key === "Enter" &&
-                                mostrarVista(n , e)
+                                mostrarVista(n.id ? n.id : "" , e)
                             }}
                         >
-                            <p className="p-0 m-0 text-white text-center text-xl max-w-full text">{n}</p>
-                            <p className="p-0 m-0 text-white text-center text-sm w-full"><span className="text-yellow-500 me-1">$</span>{n}</p>
+                            <p className="p-0 m-0 text-white text-center text-xl max-w-full text">{n.nombre}</p>
+                            <p className="p-0 m-0 text-white text-center text-sm w-full"><span className="text-yellow-500 me-1">$</span>{n.precio}</p>
                         </li>
                     )}
                     <div 
