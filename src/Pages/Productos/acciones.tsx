@@ -32,12 +32,16 @@ export default function AccionesProducto(){
         return precio > 0 && nombre.length > 0 && nombre.length < 40
     }
 
-    const obtenerData = async (id:string) => {
-        const producto = await GetProducto(id);
-        if(producto) setProductoEdit(producto);
+    const obtenerData = (id:string) => {
+        const producto:Producto | undefined = GetProducto(id);
+        if(producto){
+            setNombre(producto.nombre)
+            setPrecio(producto.precio)
+            setProductoEdit(producto);
+        } 
     }
 
-    const agregar = async () => {
+    const agregar = () => {
         if(!comprobarPeticion()) return;
         const newProducto:Producto = {
             precio,
@@ -45,11 +49,11 @@ export default function AccionesProducto(){
             vendidos: 0
         }
         
-        await CreateProducto(newProducto);
+        CreateProducto(newProducto);
         clean();
     }
 
-    const editar = async () => {
+    const editar = () => {
         if(!comprobarPeticion()) return;
         const newProducto:Producto = {
             id: productoEdit.id,
@@ -58,7 +62,8 @@ export default function AccionesProducto(){
             vendidos: productoEdit.vendidos
         }
         
-        await UpdateProducto(newProducto);
+        UpdateProducto(newProducto);
+        navigate("/Productos")
     }
     
     const clean = () => {

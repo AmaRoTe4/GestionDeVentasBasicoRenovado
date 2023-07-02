@@ -50,7 +50,7 @@ export default function Productos(){
                         <li
                             ref={i === 0 ? referenciaDeInicio : null}
                             tabIndex={1}
-                            key={n.id} 
+                            key={n.id ? n.id : n.nombre} 
                             className="h-[100px] w-[200px] bg-gris_oscuro mb-2 mx-2 rounded-[10px] p-2 flex flex-col justify-center cursor-pointer hover:opacity-70 focus:opacity-70" 
                             onDoubleClick={e => {
                                 mostrarVista(n.id ? n.id : "" , e)

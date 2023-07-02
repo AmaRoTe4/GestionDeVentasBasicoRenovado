@@ -5,14 +5,14 @@ import {
     deleteVenta,
 } from "../database/ventas";
 
-export const GetAllVenta = async () => {
-  return await getAllVenta();
+export const GetAllVenta =  () => {
+  return getAllVenta();
 };
 
-export const CreateVenta = async (venta:Venta) => {
-    return await createVenta(venta);
+export const CreateVenta =  (venta:Venta) => {
+    return createVenta(venta);
 };
 
-export const DeleteVenta = async (id:string) => {    
-    return await deleteVenta(id);
+export const DeleteVenta =  (id:string) => {    
+    return deleteVenta(id);
 };

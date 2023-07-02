@@ -1,14 +1,11 @@
 import { useEffect, useRef, useState } from 'react'
-//import { InterProductos , } from "../../types."
-//import TablaVentas from '../../components/tabla';
-//import { mostrarTodosLosProductos , mostrarProductoNombre} from '../../database/productos'
-//import { AgreProducto } from '../../functions/productos'
-//import { RealizarVenta } from '../../functions/ventas'
 import { Bounce, toast } from 'react-toastify'
 import FlechaArriba from "../../svg/flechaArriba.svg"
 import Remove from "../../svg/delete.svg"
 import { Producto, Venta } from '../../types'
-import { GetAllProducto } from '../../functions/productos'
+import { GetAllProducto, UpdateProductosALaVez } from '../../functions/productos'
+import { fechaActual } from '../../functions'
+import { CreateVenta } from '../../functions/ventas'
 
 export default function Ventas() {
     const [cantidadPV, setCantidadPV] = useState<number>(0)
@@ -51,43 +48,25 @@ export default function Ventas() {
         obtenerProductos()
     }, [])
 
-    const obtenerProductos = async () => {
-        //const aux = await GetAllProducto()
-        const aux: Producto[] = [
-            {
-                id: "1",
-                precio: 200,
-                nombre: "Coca 1L",
-                vendidos: 10
-            },
-            {
-                id: "2",
-                precio: 110,
-                nombre: "Pepsi 1L",
-                vendidos: 5
-            },
-            {
-                id: "3",
-                precio: 150,
-                nombre: "SevenUp 1L",
-                vendidos: 1
-            },
-            {
-                id: "4",
-                precio: 100,
-                nombre: "Spreet 1L",
-                vendidos: 1
-            }
-        ]
-        if (!aux) return
-        //@ts-ignore
-        const addProductos: Producto[] = aux.map(n => {
-            n?.id,
-                n.vendidos = 0,
-                n?.precio,
-                n?.nombre
-        }
-        );
+    const sanitizarProdcutos = (aux:Producto[]):Producto[] => {
+        let retorno:Producto[] = []
+        
+        if (!aux && Array.isArray(aux)) return []
+        aux.map(n => {
+            retorno.push({
+                id:n.id,
+                vendidos: 0,
+                precio:n.precio,
+                nombre:n.nombre
+            })
+        });
+
+        return retorno;
+    }
+
+    const obtenerProductos = () => {
+        const aux:Producto[] = GetAllProducto()
+        let addProductos:Producto[] = sanitizarProdcutos(aux)
 
         setProdUsar(addProductos);
         setProd(aux);
@@ -127,11 +106,14 @@ export default function Ventas() {
 
     const realizarVenta = () => {
         let newVenta: Venta = {
-            fecha: "",
+            fecha: fechaActual(),
             cantidadPV,
             precioT
         }
 
+        let newProdutos:Producto[] = UpdateProductosALaVez(prtsPorVender , prod);
+        setProd(newProdutos);
+        CreateVenta(newVenta);
         cleanGlobal();
     }
 
@@ -258,7 +240,7 @@ export const ListaProductos = ({ setVista, vista, productos, productoSelect, set
                 </button>
                 {productoSelect && <p>{productoSelect.nombre}</p>}
             </li>
-            {vista && productos.map((n, i) =>
+            {vista && productos && productos.map((n, i) =>
                 <li className={`
                     py-2 px-5 w-full
                     ${vista ? "flex opacity-100 z-10 hover:opacity-75 hover:cursor-pointer" : "-z-10 opacity-0 hover:cursor-auto"} 
@@ -298,7 +280,7 @@ export const ListaCarrito = ({ productos , setProductos , precioT }: PropsLista)
     }
 
     return (
-        <div className='flex flex-col items-center w-full h-auto mb-12'>
+        <div className='flex flex-col items-center w-full md:w-[50%] h-auto mb-12'>
             <ul className='flex flex-col items-center text-lg w-[100%] border-t border-black p-4 gap-2 max-h-[50vh] overflow-y-scroll overflow-x-hidden'>
                 {productos.map((n, i) =>
                     <li className={`
