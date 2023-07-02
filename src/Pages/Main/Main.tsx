@@ -1,10 +1,9 @@
 import { Link } from "react-router-dom";
-import ImageMain from "../../images/main.jpg";
 import WhatsApp from "../../svg/whatsapp.svg";
 
 export default function Main() {
     return (
-        <main className="bg-gris_claro min-h-[500px] h-[90vh] w-full flex flex-col items-center">
+        <main className="bg-gris_claro min-h-[500px] h-[90vh] max-h-[90vh] w-full flex flex-col items-center">
             <article className="h-[50%] md:h-[70%] mb-[5%] md:mb-0 w-full flex flex-col">
                 <div className="h-[85%] md:h-[100%] w-full flex flex-col md:flex-row md:justify-center md:items-center mt-[15%] md:mt-0">
                     <ul className="h-[100%] md:h-[80%] w-[90%] md:w-[50%] flex flex-col justify-between mx-[5%] md:mx-[5%] md:mt-[10%]">

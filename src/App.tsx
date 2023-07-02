@@ -7,8 +7,9 @@ import Ajustes from './Pages/Ajustes/index'
 import Productos from './Pages/Productos/index'
 import AccionesProductos from './Pages/Productos/acciones'
 import NavBar from "./components/navBar";
-import { ToastContainer } from 'react-toastify'
+import { ToastContainer } from 'react-toastify';
 import { useEffect, useState } from 'react'
+import { CartelExpressError } from './components/carteles'
 
 function App() {
 	const [btnEstado, setBtnEstado] = useState<boolean>(false)

@@ -1,26 +1,77 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import FlechaArriba from "../../svg/flechaArriba.svg"
-import Remove from "../../svg/delete.svg"
+import DeleteAll from "../../svg/deleteAll.svg"
 import { Producto, Venta } from "../../types";
 import { GetAllVenta } from "../../functions/ventas";
 import { GetAllProducto } from "../../functions/productos";
+import { CartelBorrarAll } from "../../components/carteles";
 
 export default function Totales() {
+    const [borrarAllProd, setBorrarAllProd] = useState<boolean>(false)
+    const [borrarAllVenta, setBorrarAllVenta] = useState<boolean>(false)
+
     return (
-        <main className="w-full min-h-[90vh] bg-gris_claro pb-[100px]">
-            <div className='w-full h-[70px] flex justify-center items-center'>
-                <h1 className="text-2xl font-black">Totales</h1>
-            </div>
-            <div className='w-full h-auto flex flex-col justify-center items-center border-t border-black py-5'>
-                <h2 className="text-2xl font-black">Ventas</h2>
-                <ListaVentas />
-            </div>
-            <div className='w-full h-auto flex flex-col justify-center items-center border-t border-black py-5'>
-                <h2 className="text-2xl font-black">Productos</h2>
-                <ListaProductos />
-            </div>
-        </main>
+        <>
+
+            {borrarAllProd &&
+                <CartelBorrarAll
+                    type={1}
+                    condicion={borrarAllProd}
+                    setCondicion={setBorrarAllProd}
+                />
+            }
+            {borrarAllVenta &&
+                <CartelBorrarAll
+                    type={2}
+                    condicion={borrarAllVenta}
+                    setCondicion={setBorrarAllVenta}
+                />
+            }
+            <main className="w-full min-h-[90vh] max-h-[150vh] bg-gris_claro pb-[100px]">
+                <div className='w-full h-[70px] flex justify-center items-center'>
+                    <h1 className="text-2xl font-black">Totales</h1>
+                </div>
+                <div className='w-full h-auto flex flex-col justify-center items-center border-t border-black py-5'>
+                    <div className="h-[10%] flex justify-between items-center w-full md:w-[60%]">
+                        <div className='flex justify-center items-center w-[150px]'></div>
+                        <div className='flex justify-center items-center'>
+                            <h2 className="text-2xl font-black">Ventas</h2>
+                        </div>
+                        <div className='flex justify-center items-center'>
+                            <button
+                                type="button"
+                                className='flex justify-end items-center w-[150px]'
+                                onClick={e => { e.preventDefault(); setBorrarAllVenta(true) }}
+                            >
+                                {/* @ts-ignore */}
+                                <DeleteAll className="h-[40px] hover:opacity-70" />
+                            </button>
+                        </div>
+                    </div>
+                    <ListaVentas />
+                </div>
+                <div className='w-full h-auto flex flex-col justify-center items-center border-t border-black py-5'>
+                    <div className="h-[10%] flex justify-between items-center w-full md:w-[60%]">
+                        <div className='flex justify-center items-center w-[150px]'></div>
+                        <div className='flex justify-center items-center'>
+                            <h2 className="text-2xl font-black">Productos</h2>
+                        </div>
+                        <div className='flex justify-center items-center'>
+                            <button
+                                type="button"
+                                className='flex justify-end items-center w-[150px]'
+                                onClick={e => { e.preventDefault(); setBorrarAllProd(true) }}
+                            >
+                                {/* @ts-ignore */}
+                                <DeleteAll className="h-[40px] hover:opacity-70" />
+                            </button>
+                        </div>
+                    </div>
+                    <ListaProductos />
+                </div>
+            </main>
+        </>
     )
 }
 
@@ -32,18 +83,18 @@ export const ListaVentas = () => {
     useEffect(() => {
         cargarVentas();
         calcularTotales();
-    },[ventas])
-    
+    }, [ventas])
+
     const cargarVentas = () => {
-        if(ventas.length > 0) return;
-        const aux:Venta[] = GetAllVenta()
-        if(!aux) return;
-        if(aux.length === 0) return;
-        setVentas(aux); 
+        if (ventas.length > 0) return;
+        const aux: Venta[] = GetAllVenta()
+        if (!aux) return;
+        if (aux.length === 0) return;
+        setVentas(aux);
     }
 
     const calcularTotales = () => {
-        if(!ventas) return;
+        if (!ventas) return;
         let total = 0;
         ventas.forEach(n => total += n.precioT)
         setPrecioT(total);
@@ -57,7 +108,8 @@ export const ListaVentas = () => {
                     className={`hover:cursor-pointer transition-all duration-100 ease-linear ${vista && "rotate-180"}`}
                     onClick={e => { e.preventDefault(); setVista(n => !n) }}
                 >
-                    <FlechaArriba />
+                    {/* @ts-ignore */}
+                    <FlechaArriba style={{ fill: "black" }} />
                 </button>
                 <span className={`
                     ${vista ? "flex opacity-100 z-50" : "-z-10 opacity-0 hover:cursor-auto hidden"} 
@@ -99,7 +151,7 @@ export const ListaVentas = () => {
                             {n.cantidadPV}
                         </p>
                         <p className='w-[25%] text-end ms-[2.5%]'>
-                            ${n.precioT}
+                            <span className="text-yellow-500 font-mono me-1">$</span>{n.precioT}
                         </p>
                     </li>
                 )}
@@ -116,7 +168,7 @@ export const ListaVentas = () => {
                     Total
                 </p>
                 <p className='w-[100px]'>
-                    ${precioT}
+                    <span className="font-mono me-1">$</span>{precioT}
                 </p>
             </div>
         </div>
@@ -129,13 +181,13 @@ export const ListaProductos = () => {
 
     useEffect(() => {
         cargarProducto();
-    },[])
-    
+    }, [])
+
     const cargarProducto = () => {
-        const aux:Producto[] = GetAllProducto()
-        if(!aux) return;
-        if(aux.length === 0) return;
-        setProductos(aux); 
+        const aux: Producto[] = GetAllProducto()
+        if (!aux) return;
+        if (aux.length === 0) return;
+        setProductos(aux);
     }
 
     return (
@@ -146,7 +198,8 @@ export const ListaProductos = () => {
                     className={`hover:cursor-pointer transition-all duration-100 ease-linear ${vista && "rotate-180"}`}
                     onClick={e => { e.preventDefault(); setVista(n => !n) }}
                 >
-                    <FlechaArriba />
+                    {/* @ts-ignore */}
+                    <FlechaArriba style={{ fill: "black" }} />
                 </button>
                 <li className={`
                     ${vista ? "flex opacity-100 z-50" : "-z-10 opacity-0 hover:cursor-auto hidden"} 
@@ -188,7 +241,7 @@ export const ListaProductos = () => {
                             {n.vendidos}
                         </p>
                         <p className='w-[25%] text-end ms-[2.5%]'>
-                            ${n.vendidos * n.precio}
+                            <span className="text-yellow-500 font-mono me-1">$</span>{n.vendidos * n.precio}
                         </p>
                     </li>
                 )}

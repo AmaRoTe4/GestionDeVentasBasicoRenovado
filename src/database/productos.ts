@@ -209,3 +209,7 @@ export const deleteProducto = (id: string) => {
 
   localStorage.setItem('productos', productosString);
 };
+
+export const deleteAllProducto = () => {
+  localStorage.setItem('productos', "");
+};

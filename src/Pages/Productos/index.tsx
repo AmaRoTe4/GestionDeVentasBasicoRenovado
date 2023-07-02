@@ -1,23 +1,25 @@
 import {useState,useEffect, useRef} from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import Mas from '../../svg/mas.svg'
-import CartelProducto from '../../components/cartelProductos'
+import DeleteAll from "../../svg/deleteAll.svg"
+import {CartelProducto , CartelBorrarAll} from '../../components/carteles'
 import { Producto } from '../../types'
 import { GetAllProducto } from '../../functions/productos'
 
 export default function Productos(){
     const [element, setElement] = useState<Producto[]>([])
     const [cartel , setCartel] = useState<string>("")
-    const navigate = useNavigate()
+    const [borrarAll , setBorralAll] = useState<boolean>(false)
     const referenciaDeInicio = useRef<HTMLLIElement>(null)
     const referenciaDeCartel = useRef<HTMLButtonElement>(null)
+    const navigate = useNavigate()
 
     useEffect(() => {
         cargaDeElementos()
     },[cartel])
 
-    const cargaDeElementos = async() => {
-        const aux = await GetAllProducto()
+    const cargaDeElementos = () => {
+        const aux = GetAllProducto()
         if(aux) setElement(aux)
     }
     
@@ -36,14 +38,34 @@ export default function Productos(){
     return (
         <>
             {cartel !== "" && 
-                <CartelProducto 
+                <CartelProducto
                     cartel={cartel} 
                     setCartel={setCartel} 
                 />
             }
-            <main className="bg-gris_claro min-h-[500px] h-[90vh] w-full flex flex-col items-center">
-                <div className="h-[10%] w-full flex justify-center items-center">
-                    <h1 className="text-2xl font-black">Productos</h1>
+            {borrarAll && 
+                <CartelBorrarAll
+                    type={1}
+                    condicion={borrarAll} 
+                    setCondicion={setBorralAll}
+                />
+            }
+            <main className="bg-gris_claro min-h-[500px] h-[90vh] max-h-[90vh] w-full flex flex-col items-center">
+                <div className="h-[10%] w-[90%] flex justify-between items-center">
+                    <div className='flex justify-center items-center w-[150px]'></div>
+                    <div className='flex justify-center items-center'>
+                        <h1 className="text-2xl font-black text-center">Productos</h1>
+                    </div>
+                    <div className='flex justify-center items-center'>
+                        <button 
+                            type="button" 
+                            className='flex justify-end items-center w-[150px]'
+                            onClick={e => {e.preventDefault() ; setBorralAll(true)}}
+                        >
+                            {/* @ts-ignore */}
+                            <DeleteAll className="h-[40px] hover:opacity-70"/>
+                        </button>
+                    </div>
                 </div>
                 <ul className="max-h-[90%] w-[100%] md:w-[90%] border-t border-black pt-[20px] px-[20px] pb-[50px] flex justify-center flex-wrap overflow-y-scroll overflox-x-hidden">
                     {element.length > 0 && element.map((n , i) =>
@@ -52,7 +74,7 @@ export default function Productos(){
                             tabIndex={1}
                             key={n.id ? n.id : n.nombre} 
                             className="h-[100px] w-[200px] bg-gris_oscuro mb-2 mx-2 rounded-[10px] p-2 flex flex-col justify-center cursor-pointer hover:opacity-70 focus:opacity-70" 
-                            onDoubleClick={e => {
+                            onClick={e => {
                                 mostrarVista(n.id ? n.id : "" , e)
                             }}
                             onKeyDown={e => {

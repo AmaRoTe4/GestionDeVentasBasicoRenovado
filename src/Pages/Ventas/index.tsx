@@ -6,6 +6,7 @@ import { Producto, Venta } from '../../types'
 import { GetAllProducto, UpdateProductosALaVez } from '../../functions/productos'
 import { fechaActual } from '../../functions'
 import { CreateVenta } from '../../functions/ventas'
+import { CartelExpressSucess, CartelExpressError, CartelExpressInfo } from '../../components/carteles'
 
 export default function Ventas() {
     const [cantidadPV, setCantidadPV] = useState<number>(0)
@@ -48,16 +49,16 @@ export default function Ventas() {
         obtenerProductos()
     }, [])
 
-    const sanitizarProdcutos = (aux:Producto[]):Producto[] => {
-        let retorno:Producto[] = []
-        
+    const sanitizarProdcutos = (aux: Producto[]): Producto[] => {
+        let retorno: Producto[] = []
+
         if (!aux && Array.isArray(aux)) return []
         aux.map(n => {
             retorno.push({
-                id:n.id,
+                id: n.id,
                 vendidos: 0,
-                precio:n.precio,
-                nombre:n.nombre
+                precio: n.precio,
+                nombre: n.nombre
             })
         });
 
@@ -65,8 +66,8 @@ export default function Ventas() {
     }
 
     const obtenerProductos = () => {
-        const aux:Producto[] = GetAllProducto()
-        let addProductos:Producto[] = sanitizarProdcutos(aux)
+        const aux: Producto[] = GetAllProducto()
+        let addProductos: Producto[] = sanitizarProdcutos(aux)
 
         setProdUsar(addProductos);
         setProd(aux);
@@ -80,7 +81,18 @@ export default function Ventas() {
     }
 
     const validarACarrito = () => {
-        return prodSelect.vendidos !== undefined && prodSelect.nombre !== "" && cantidad > 0
+        let textMensaje = "";
+
+        if (prodSelect.nombre === "") {
+            textMensaje = "Tiene que seleccionar un Producto. \n"
+            CartelExpressInfo({ text: textMensaje, time: 5000, className: "w-[100vw] md:w-[80vw] text-center", position: "top-left" });
+        }
+        if (cantidad <= 0) {
+            textMensaje = "Tiene que ingresar una Cantidad mayor a 0."
+            CartelExpressInfo({ text: textMensaje, time: 5000, className: "w-[100vw] md:w-[80vw] text-center", position: "top-left" });
+        }
+
+        return textMensaje === "";
     }
 
     const AgregarACarrito = () => {
@@ -105,16 +117,23 @@ export default function Ventas() {
     }
 
     const realizarVenta = () => {
+        if (prtsPorVender.length === 0) {
+            CartelExpressInfo({ text: "No puedes Realizar una Venta vacia" });
+            return;
+        }
+
         let newVenta: Venta = {
             fecha: fechaActual(),
             cantidadPV,
             precioT
         }
 
-        let newProdutos:Producto[] = UpdateProductosALaVez(prtsPorVender , prod);
+        let newProdutos: Producto[] = UpdateProductosALaVez(prtsPorVender, prod);
         setProd(newProdutos);
         CreateVenta(newVenta);
         cleanGlobal();
+
+        CartelExpressSucess({ text: "Venta Realizada con Exito!" });
     }
 
     const cleanAgregar = () => {
@@ -135,7 +154,7 @@ export default function Ventas() {
     }
 
     return (
-        <main className="w-full min-h-[90vh] bg-gris_claro">
+        <main className="w-full min-h-[90vh] max-h-[150vh] md:max-h-[110vh] bg-gris_claro">
             <div className='w-full h-[70px] flex justify-center items-center'>
                 <h1 className="text-2xl font-black">Ventas</h1>
             </div>
@@ -196,10 +215,10 @@ export default function Ventas() {
                 />
             </div>
             <div className='w-full bg-red h-auto flex flex-col justify-center items-center mt-4 mb-16 gap-10 md:gap-4'>
-                <button 
-                    className="bg-green-600 w-[90%] md:w-[50%] py-3 rounded-md text-white text-lg" 
+                <button
+                    className="bg-green-600 w-[90%] md:w-[50%] py-3 rounded-md text-white text-lg"
                     type="button"
-                    onClick={e => {e.preventDefault(); realizarVenta()}}
+                    onClick={e => { e.preventDefault(); realizarVenta() }}
                 >Finalizar Venta</button>
                 <button
                     className="bg-rojo w-[90%] md:w-[50%] py-3 rounded-md text-white text-lg"
@@ -229,7 +248,7 @@ export const ListaProductos = ({ setVista, vista, productos, productoSelect, set
 
     return (
         <ul className={`${vista ? "shadow-lg shadow-black" : ""} z-10 absolute mt-14 flex flex-col items-center text-lg w-[90%] md:w-[50%] p-4 mb-12 rounded-b-md  gap-2 max-h-[60vh] min-h-[50px] overflow-y-scroll overflow-x-hidden transition-all duration-100 ease-linear bg-gris_claro`}>
-            <li className='absolute w-full px-4 h-[40px] gap-5 flex justify-start items-center rounded-sm'>
+            <li className={`${vista ? "pb-1" : ""}absolute w-full h-[40px] gap-5 flex justify-start items-center rounded-sm`}>
                 <button
                     tabIndex={-1}
                     type="button"
@@ -244,14 +263,13 @@ export const ListaProductos = ({ setVista, vista, productos, productoSelect, set
                 <li className={`
                     py-2 px-5 w-full
                     ${vista ? "flex opacity-100 z-10 hover:opacity-75 hover:cursor-pointer" : "-z-10 opacity-0 hover:cursor-auto"} 
-                    ${i === 0 && "mt-12"} 
+                    ${i === 0 && "mt-3"} 
                   bg-white flex justify-between items-center rounded-sm
                     border border-black hover:bg-gris_claro
                     transition-all duration-100 ease-in-out
                     text-sm md:text-base
                 `}
                     key={n.id}
-                    tabIndex={1}
                     onClick={e => { e.preventDefault(); Seleccionar(n) }}
                     onKeyDown={e => {
                         e.preventDefault();
@@ -264,7 +282,7 @@ export const ListaProductos = ({ setVista, vista, productos, productoSelect, set
                         {n.nombre}
                     </p>
                     <p className='w-[100px]'>
-                        ${n.precio}
+                        <span className="text-yellow-500 font-mono me-1">$</span>{n.precio}
                     </p>
                 </li>
             )}
@@ -272,9 +290,9 @@ export const ListaProductos = ({ setVista, vista, productos, productoSelect, set
     )
 }
 
-export const ListaCarrito = ({ productos , setProductos , precioT }: PropsLista) => {
-    const sacarDelCarro = (id:string) => {
-        if(id === "") return;
+export const ListaCarrito = ({ productos, setProductos, precioT }: PropsLista) => {
+    const sacarDelCarro = (id: string) => {
+        if (id === "") return;
         //@ts-ignore
         setProductos(n => n.filter(m => m.id !== id))
     }
@@ -296,11 +314,11 @@ export const ListaCarrito = ({ productos , setProductos , precioT }: PropsLista)
                             {n.vendidos}
                         </p>
                         <p className='w-[100px]'>
-                            ${n.precio * n.vendidos}
+                            <span className="text-yellow-500 font-mono me-1">$</span>{n.precio * n.vendidos}
                         </p>
-                        <button 
+                        <button
                             className='h-full w-[30px] ms-5 hover:opacity-75 hover:cursor-pointer'
-                            onClick={e => {e.preventDefault() ; sacarDelCarro(n.id ? n.id : "")}}
+                            onClick={e => { e.preventDefault(); sacarDelCarro(n.id ? n.id : "") }}
                         >
                             {/* @ts-ignore */}
                             <Remove className="h-full w-full" />
@@ -320,7 +338,7 @@ export const ListaCarrito = ({ productos , setProductos , precioT }: PropsLista)
                     Total
                 </p>
                 <p className='w-[100px]'>
-                    ${precioT}
+                    <span className="font-mono me-1">$</span>{precioT}
                 </p>
             </div>
         </div>

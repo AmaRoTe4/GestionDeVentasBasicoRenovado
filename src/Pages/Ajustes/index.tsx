@@ -1,5 +1,4 @@
 import { useNavigate } from 'react-router-dom'
-//import { ResetDataBase } from '../../database/index'
 import { useEffect, useState } from 'react'
 import { GetAllVenta } from '../../functions/ventas'
 
@@ -8,20 +7,13 @@ export default function Ajustes(){
     const [contrasenia , setContrasenia] = useState<string>("")
     const clave = "adelante...123"
 
-    useEffect(() =>{
-        datos()
-    },[])
-
-    const datos = async () => {
-        await GetAllVenta()
-    }
-
     //@ts-ignore
     const volverAMain = () => setTimeout( navigate('/') , 3000)
 
     return (
-        <main className="bg-gris_claro min-h-[500px] h-[90vh] w-full flex flex-col justify-center items-center">
-            <div className="flex flex-col mb-8">
+        <main className="bg-gris_claro min-h-[500px] h-[90vh] max-h-[90vh] w-full flex flex-col justify-center items-center">
+            <h1>Proximamente</h1>
+            {/*<div className="flex flex-col mb-8">
                 <form className="flex flex-col">
                     <label className='me-4 text-ls w-[100px]' htmlFor="contrasenia">Clave</label>
                     <input
@@ -54,16 +46,11 @@ export default function Ajustes(){
                     disabled={contrasenia !== clave} 
                     className="w-[200px] py-2 bg-rojo text-white rounded-xl"
                     onClick={e => {e.preventDefault();
-                        //ResetDataBase(); Swal.fire({
-                            //title: 'Elinada con Exito!',
-                            //icon: 'success',
-                            //confirmButtonText: 'Ok',
-                        //});
                     volverAMain() }}
                 >    
                     Reset
                 </button>
-            </div>
+            </div>*/}
         </main>
     )
 }

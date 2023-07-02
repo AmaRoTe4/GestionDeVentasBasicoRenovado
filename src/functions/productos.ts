@@ -1,6 +1,7 @@
 import { Producto } from "../types";
 import {
   createProducto,
+  deleteAllProducto,
   deleteProducto,
   getAllProducto,
   getProducto,
@@ -50,3 +51,7 @@ export const UpdateProductosALaVez = (productosAct: Producto[] , productosGuarda
 
   return productosUsar
 };
+
+export const DeleteAllProducto = () => {
+  return deleteAllProducto()
+}
